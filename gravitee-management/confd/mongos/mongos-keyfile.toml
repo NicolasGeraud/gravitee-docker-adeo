@@ -1,0 +1,13 @@
+[template]
+src = "mongos-keyfile.tmpl"
+dest = "/home2/mongodb/mongos-keyfile"
+mode = "0600"
+owner = "mongod"
+group = "mongod"
+keys = [
+		"/graviteeio/apim/mongos/dc_a/keyfile",
+		"/graviteeio/apim/mongos/dc_b/keyfile",
+		"/graviteeio/apim/mongos/dc_c/keyfile",	
+		"/graviteeio/apim/mongos/dc_d/keyfile",
+		"/graviteeio/apim/mongos/dc_e/keyfile"
+]

@@ -1,0 +1,7 @@
+name: Gravitee gateway + Mongos
+description: |
+  Gravitee gateway + mongos router 
+version: 1.0.0
+category: API management
+maintainer: Olivier Lehouck <olivier.lehouck@adeo.com>
+projectURL: 

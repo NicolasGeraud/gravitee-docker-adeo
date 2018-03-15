@@ -1,0 +1,6 @@
+{{$dc := getenv "TARGET_DC" }}
+{{$conf := printf "/graviteeio/apim/mongos/dc_%s/configdb" $dc }}
+configdb={{ getv $conf }}
+keyFile=/home2/mongodb/mongos-keyfile
+{{$port := printf "/graviteeio/apim/mongos/dc_%s/port" $dc }}
+port={{ if exists $port }}{{ getv $port }}{{else}}27017{{end}}

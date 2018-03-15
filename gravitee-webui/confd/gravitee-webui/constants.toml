@@ -1,0 +1,14 @@
+[template]
+src = "constants.json.tmpl"
+dest = "/var/www/html/constants.json"
+keys = [
+"/graviteeio/apim/webui/baseUrl",
+"/graviteeio/apim/webui/devMode",
+"/graviteeio/apim/webui/userCreation",
+"/graviteeio/apim/webui/portal/entryPoint",
+"/graviteeio/apim/webui/portal/apis/tileMode",
+"/graviteeio/apim/webui/support",
+"/graviteeio/apim/webui/rating",
+"/graviteeio/apim/webui/analytics",
+"/graviteeio/apim/webui/scheduler/tasks"
+]

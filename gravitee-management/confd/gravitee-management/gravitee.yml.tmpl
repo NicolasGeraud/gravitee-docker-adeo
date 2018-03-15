@@ -1,0 +1,439 @@
+############################################################################################################
+################################ Gravitee.IO Management API - Configuration ################################
+############################################################################################################
+
+############################################################################################################
+# This file is the general configuration of Gravitee.IO Management API:
+# - Properties (and respective default values) in comment are provided for information.
+# - You can reference other property by using ${property.name} syntax
+# - gravitee.home property is automatically set-up by launcher and refers to the installation path. Do not override it !
+#
+# Please have a look to http://docs.gravitee.io/ for more options and fine-grained granularity
+############################################################################################################
+
+#data center
+{{$dc := getenv "TARGET_DC"}}
+
+# HTTP Server
+#jetty:
+#  IP/hostname to bind to. Default is 0.0.0.0
+#  host: 0.0.0.0
+#  port: 8083
+#  idleTimeout: 30000
+#  acceptors: -1
+#  selectors: -1
+#  pool:
+#    minThreads: 10
+#    maxThreads: 200
+#    idleTimeout: 60000
+#    queueSize: 6000
+#  jmx: false
+#  statistics: false
+#  accesslog:
+#    enabled: true
+#    path: ${gravitee.home}/logs/gravitee_accesslog_yyyy_mm_dd.log
+
+{{if exists "/graviteeio/apim/management/jetty/customize"}}
+{{if eq (getv "/graviteeio/apim/management/jetty/customize") "true"}}
+jetty:  
+  host: {{getv "/graviteeio/apim/management/jetty/host" "0.0.0.0"}}
+  port: {{getv "/graviteeio/apim/management/jetty/host" "8083"}}
+  idleTimeout: {{getv "/graviteeio/apim/management/jetty/idleTimeout" "30000"}}
+  acceptors: {{getv "/graviteeio/apim/management/jetty/acceptors" "-1"}}
+  selectors: {{getv "/graviteeio/apim/management/jetty/selectors" "-1"}}
+  pool:
+    minThreads: {{getv "/graviteeio/apim/management/jetty/pool/minThreads" "10"}}
+    maxThreads: {{getv "/graviteeio/apim/management/jetty/pool/maxThreads" "200"}}
+    idleTimeout: {{getv "/graviteeio/apim/management/jetty/pool/idleTimeout" "60000"}}
+    queueSize: {{getv "/graviteeio/apim/management/jetty/pool/queueSize" "6000"}}
+  jmx: {{getv "/graviteeio/apim/management/jetty/jmx" "false"}}
+  statistics: {{getv "/graviteeio/apim/management/jetty/statistics" "false"}}
+  accesslog:
+    enabled: {{getv "/graviteeio/apim/management/jetty/accesslog/enable" "true"}}
+    path: {{getv "/graviteeio/apim/management/jetty/accesslog/path" "${gravitee.home}/logs/gravitee_accesslog_yyyy_mm_dd.log"}}
+{{end}}
+{{end}}
+
+
+{{if exists "/graviteeio/apim/management/http/customize"}}
+{{if eq (getv "/graviteeio/apim/management/http/customize") "true"}}
+http:
+  cors:
+    # Allows to configure the header Access-Control-Allow-Origin (default value: *)
+    # '*' is a valid value but is considered as a security risk as it will be opened to cross origin requests from anywhere.
+    allow-origin: {{getv "/graviteeio/apim/management/http/cors/allow-origin" "http://TO_BE_DEFINED"}} #http://developer.mycompany.com
+    # Allows to define how long the result of the preflight request should be cached for (default value; 1728000 [20 days])
+    max-age: {{getv "/graviteeio/apim/management/http/cors/max-age" "864000"}} 
+    # Which methods to allow (default value: OPTIONS, GET, POST, PUT, DELETE)
+    allow-methods: {{getv "/graviteeio/apim/management/http/cors/allow-methods" "'OPTIONS, GET, POST, PUT, DELETE'"}}
+    # Which headers to allow (default values: Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With, If-Match)
+    allow-headers: {{getv "/graviteeio/apim/management/http/cors/max-age" "'X-Requested-With'"}} 
+{{end}}
+{{end}}
+
+# Plugins repository
+{{if exists "/graviteeio/apim/gateway/plugins/customize"}}
+{{if eq (getv "/graviteeio/apim/gateway/plugins/customize") "true"}}
+plugins:
+  path:
+#    - ${gravitee.home}/plugins
+#    - ${gravitee.home}/my-custom-plugins
+    - ${gravitee.home}{{getv "/graviteeio/apim/gateway/plugins/path/generic" "/plugins"}} 
+    - ${gravitee.home}{{getv "/graviteeio/apim/gateway/plugins/path/custom" "/my-custom-plugins"}} 
+# If a external is already installed (but with a different version), management node does not start anymore
+  failOnDuplicate: {{getv "/graviteeio/apim/gateway/plugins/failOnDuplicate" "true"}} 
+{{end}}
+{{end}}
+
+# Management repository is used to store global configuration such as APIs, applications, apikeys, ...
+# This is the default configuration using MongoDB (single server)
+# For more information about MongoDB configuration, please have a look to:
+# - http://api.mongodb.org/java/current/com/mongodb/MongoClientOptions.html
+management:
+  {{if exists "/graviteeio/apim/gateway/management/datasource/type"}}
+  type: {{getv "/graviteeio/apim/gateway/management/datasource/type"}}
+  
+  {{if eq (getv "/graviteeio/apim/gateway/management/datasource/type") "mongodb"}}
+  mongodb:
+  {{if exists "/graviteeio/apim/gateway/management/datasource/config/type"}}
+  {{if eq (getv "/graviteeio/apim/gateway/management/datasource/config/type") "default"}}
+ #    dbname: ${ds.mongodb.dbname}
+ #    host: ${ds.mongodb.host}
+ #    port: ${ds.mongodb.port}
+ #    username:
+ #    password:
+ #    connectionsPerHost: 0
+ #    connectTimeout: 500
+ #    maxWaitTime: 120000
+ #    socketTimeout: 500
+ #    socketKeepAlive: false
+ #    maxConnectionLifeTime: 0
+ #    maxConnectionIdleTime: 0
+ #    serverSelectionTimeout: 0
+ #    description: gravitee.io
+ #    heartbeatFrequency: 10000
+ #    minHeartbeatFrequency: 500
+ #    heartbeatConnectTimeout: 1000
+ #    heartbeatSocketTimeout: 20000
+ #    localThreshold: 15
+ #    minConnectionsPerHost: 0
+ #    sslEnabled: false
+ #    threadsAllowedToBlockForConnectionMultiplier: 5
+ #    cursorFinalizerEnabled: true
+
+    authSource: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/authSource" "admin"}}
+    dbname: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/dbname" "${ds.mongodb.dbname}"}}
+    host: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/host" "${ds.mongodb.host}" }}
+    port: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/port" "${ds.mongodb.port}" }}
+    username: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/username" "gravitee"}}
+    password: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/password" ""}}
+ #   connectionsPerHost: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/connectionsPerHost" "0"}}
+ #   connectTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/connectTimeout" "500"}}
+ #   maxWaitTime: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/maxWaitTime" "120000"}}
+ #   socketTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/socketTimeout" "500"}}
+ #   socketKeepAlive: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/socketKeepAlive" "false"}} 
+ #   maxConnectionLifeTime: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/maxConnectionLifeTime" "0"}} 
+ #   maxConnectionIdleTime: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/maxConnectionIdleTime" "0"}}
+ #   serverSelectionTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/serverSelectionTimeout" "0"}} 
+ #   description: {{getv "/graviteeio/apim/gateway/management/mongo/datasource/default/description" "gravitee.io"}}
+ #   heartbeatFrequency: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/heartbeatFrequency" "10000"}}
+ #   minHeartbeatFrequency: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/minHeartbeatFrequency" "500"}}
+ #   heartbeatConnectTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/heartbeatConnectTimeout" "1000"}}
+ #   heartbeatSocketTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/heartbeatSocketTimeout" "20000"}}
+ #   localThreshold: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/localThreshold" "15"}}
+ #   minConnectionsPerHost: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/minConnectionsPerHost" "0"}}
+ #   sslEnabled: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/sslEnabled" "false"}}
+ #   threadsAllowedToBlockForConnectionMultiplier: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/threadsAllowedToBlockForConnectionMultiplier" "5"}}
+ #   cursorFinalizerEnabled: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/cursorFinalizerEnabled" "true"}}
+
+     
+    {{else if eq (getv "/graviteeio/apim/gateway/management/datasource/config/type") "uri"}}
+    # Management repository: single MongoDB using URI
+    # - http://api.mongodb.org/java/current/com/mongodb/MongoClientURI.html
+    # uri: mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]
+
+    {{ $mongo_uri := printf "/graviteeio/apim/gateway/management/mongo/config/uri/dc_%s/uri" $dc }}    
+    uri : {{getv $mongo_uri "ERR_NOT_DEFINED"}}
+
+    {{else if eq (getv "/graviteeio/apim/gateway/management/datasource/config/type") "cluster"}}
+    # Management repository: clustered MongoDB
+ #    servers:
+ #      - host: mongo1
+ #        port: 27017
+ #      - host: mongo2
+ #        port: 27017
+ #    dbname: ${ds.mongodb.dbname}
+ #    connectTimeout: 500
+ #    socketTimeout: 250
+    servers : 
+      {{ $list := printf "/graviteeio/apim/gateway/management/mongo/config/cluster/dc_%s/servers/*" $dc }}
+      {{ range getvs $list }} 
+      {{ $hostPort := split . ":"}}
+      - hosts:  {{ index $hostPort 0 }}
+        port: {{ index $hostPort 1 }}
+      {{end}}
+ 
+    {{else}} #if cluster ||default ||uri
+    dbname: ${ds.mongodb.dbname}
+    host: ${ds.mongodb.host}
+    port: ${ds.mongodb.port}
+    {{end}}
+    {{else}} # mongo config type exits
+    dbname: ${ds.mongodb.dbname}
+    host: ${ds.mongodb.host}
+    port: ${ds.mongodb.port}
+    {{end}} #exists config
+
+  {{else if eq (getv "/graviteeio/apim/gateway/management/datasource/type") "dynamodb"}}
+  dynamodb :
+ ##### TODO #####
+  {{else}}
+    dbname: ${ds.mongodb.dbname}
+    host: ${ds.mongodb.host}
+    port: ${ds.mongodb.port}
+  {{end}}
+  {{else}}
+  type: mongodb 
+  mongodb:
+    dbname: ${ds.mongodb.dbname}
+    host: ${ds.mongodb.host}
+    port: ${ds.mongodb.port}
+  {{end}} # exists datasource
+
+services:
+  core:
+    http:
+      enabled: {{getv "/graviteeio/apim/management/services/core/http/enable" "true"}} 
+      port: {{getv "/graviteeio/apim/management/services/core/http/port" "18083"}}
+      host: {{getv "/graviteeio/apim/management/services/core/http/host" "localhost"}}
+      authentication:
+        # authentication type to be used for the core services
+        # - none : to disable authentication
+        # - basic : to use basic authentication
+        # default is "basic"
+        type: {{getv "/graviteeio/apim/management/services/core/http/authentication/type" "basic"}}
+        users:
+          admin: {{getv "/graviteeio/apim/management/services/core/http/authentication/users/password" "adminadmin"}}
+
+# Analytics repository is used to store all reporting, metrics, healthchecks stored by gateway instances
+# This is the default configuration using Elasticearch
+analytics:
+  type: elasticsearch
+  elasticsearch:
+    endpoints:
+    {{if exists "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/type"}}
+    {{if eq (getv "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/type") "cluster"}}
+    {{ $es_list := printf "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/servers/dc_%s/*" $dc }}
+    {{range getvs $es_list}} 
+      - {{.}}
+    {{end}}
+    {{else if eq (getv "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/type") "default"}}
+    {{ $es_host := printf "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/servers/dc_%s/1" $dc }}
+      - http://{{getv $es_host}}
+    {{else}}
+      - http://${ds.elastic.host}:${ds.elastic.port}
+    {{end}}
+    {{else}}
+      - http://${ds.elastic.host}:${ds.elastic.port}
+    {{end}} #exists endpoints/type
+
+    index: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/index" "gravitee"}}
+    cluster: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/cluster" "elasticsearch"}}
+    
+    security:
+      username: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/security/username" "gravitee"}} 
+      password: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/security/password" "gravitee"}}   
+  
+    settings:
+      number_of_shards: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/settings/number_of_shards" "5"}}
+      number_of_replicas: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/settings/number_of_replicas" "1"}}
+
+
+# Authentication and identity sources
+# Users can have following roles (authorities):
+#  USER: Can access portal and be a member of an API
+#  API_PUBLISHER: Can create and manage APIs
+#  API_CONSUMER: Can create and manage Applications
+#  ADMIN: Can manage global system
+security:
+  providers:  # authentication providers
+  {{if exists "/graviteeio/apim/management/security/providers/type/memory/enable"}}
+  {{if eq (getv "/graviteeio/apim/management/security/providers/type/memory/enable") "true"}}
+    - type: memory
+      # password encoding/hashing algorithm. One of:
+      # - bcrypt : passwords are hashed with bcrypt
+      # - none : passwords are not hashed/encrypted
+      # default value is bcrypt
+      password-encoding-algo: {{getv "/graviteeio/apim/management/security/providers/type/memory/password-encoding-algo" "bcrypt"}}
+      users:
+        #- user:
+        #  username: api1
+        # Password value: api1
+        #  password: $2a$10$iXdXO4wAYdhx2LOwijsp7.PsoAZQ05zEdHxbriIYCbtyo.y32LTji
+        # You can declare multiple roles using comma separator
+        #  roles: MANAGEMENT:API_PUBLISHER, PORTAL:API_PUBLISHER
+        - user:
+          username: admin
+          # Password value: admin
+          password: $2a$10$Ihk05VSds5rUSgMdsMVi9OKMIx2yUvMz7y9VP3rJmQeizZLrhLMyq
+          roles: ADMIN
+
+       {{range getvs "/graviteeio/apim/management/security/providers/type/memory/users/*"}}
+        - user:
+          {{.}}
+      {{end}}
+  {{end}}
+  {{end}}
+  
+  {{if exists "/graviteeio/apim/management/security/providers/type/gravitee/enable"}}    
+  {{if eq (getv "/graviteeio/apim/management/security/providers/type/gravitee/enable") "true"}}
+    - type: gravitee  
+    #TODO 
+  {{end}}
+  {{end}}
+  
+  {{if exists "/graviteeio/apim/management/security/providers/type/ldap/enable"}}
+  {{if eq (getv "/graviteeio/apim/management/security/providers/type/ldap/enable") "true"}}
+    - type: ldap  
+      context-source-username: {{getv "/graviteeio/apim/management/security/providers/type/ldap/context-source-username" }} 
+      #context-source-username : "uid=admin,ou=system"
+      context-source-password: {{getv "/graviteeio/apim/management/security/providers/type/ldap/context-source-password" }}  
+      #context-source-password: "secret"
+      context-source-url: {{getv "/graviteeio/apim/management/security/providers/type/ldap/context-source-url" }} 
+      #context-source-url: "ldap://localhost:10389/c=io,o=gravitee"
+      context-source-base: {{getv "/graviteeio/apim/management/security/providers/type/ldap/context-source-base" }} 
+      #context-source-base: "c=io,o=gravitee" # the context source base
+      
+      # The 'user-dn-patterns' value is a specific pattern used to build the user's DN, for example "uid={0},ou=people". The key "{0}" must be present and will be substituted with the username.
+      user-dn-patterns: {{getv "/graviteeio/apim/management/security/providers/type/ldap/user-dn-patterns" }} 
+      #user-dn-patterns: "uid={0},ou=people"
+      # Search base for user searches. Defaults to "". Only used with user-search-filter.
+      user-search-base: {{getv "/graviteeio/apim/management/security/providers/type/ldap/user-search-base" "" }} 
+      #user-search-base: "o=user accounts"
+      # The LDAP filter used to search for users (optional). For example "(uid={0})". The substituted parameter is the user's login name.
+      user-search-filter:  {{getv "/graviteeio/apim/management/security/providers/type/ldap/user-search-filter" }}
+      #user-search-filter: "mail={0}"
+      # The objectclass used when searching for user (optional). Default is "person".
+      user-search-objectclass:  {{getv "/graviteeio/apim/management/security/providers/type/ldap/user-search-objectclass" "person" }}
+      #user-search-objectclass: "person"
+
+      # The search base for group membership searches. Defaults to "".
+      group-search-base:  {{getv "/graviteeio/apim/management/security/providers/type/ldap/group-search-base" "" }}
+      #group-search-base: "o=authorization groups"
+      # The LDAP filter to search for groups. Defaults to "(uniqueMember={0})". The substituted parameter is the DN of the user.
+      #group-search-filter: "member={0}"
+      # Specifies the attribute name which contains the role name. Default is "cn".
+      group-role-attribute: {{getv "/graviteeio/apim/management/security/providers/type/ldap/group-role-attribute" "cn" }} 
+      #group-role-attribute: "cn"
+      #   Use role-mapper to map LDAP role with internal Gravitee role (syntax { "user_ldap_role" : "user_new_added_ldap_role"})
+      {{if exists "/graviteeio/apim/management/security/providers/type/ldap/role-mapper"}}
+      role-mapper: 
+        {{getv "/graviteeio/apim/management/security/providers/type/ldap/role-mapper" "" }}
+      {{end}}
+      
+#      role-mapper: 
+#        GRAVITEE-CONSUMERS: API_CONSUMER,
+#        GRAVITEE-PUBLISHERS: API_PUBLISHER,
+#        GRAVITEE-ADMINS: ADMIN,
+#        GRAVITEE-USERS: USER,
+#      
+  {{end}}
+  {{end}}
+ 
+
+#    - type: google # Allow to authenticate to portal using a Google Plus account
+#      clientId: xxxx-xxx-xxx-xxx
+#      clientSecret: xxxx-xxx-xxx-xxxx
+#    - type: github # Allow to authenticate to portal using a GitHub account
+#      clientId: xxxx-xxx-xxx-xxx
+#      clientSecret: xxxx-xxx-xxx-xxxx
+#    - type: oauth2
+#      clientId: xxxx-xxx-xxx-xxx
+#      clientSecret: xxxx-xxx-xxx-xxx
+#      tokenEndpoint: https://oauth2_authorization_server/token
+#      userInfoEndpoint: https://oauth2_authorization_server/userinfo
+#      accessTokenProperty: access_token
+#      authorizationHeader: "Bearer %s"
+#      mapping:
+#        id: sub
+#        email: email
+#        lastname: family_name
+#        firstname: given_name
+#        picture: picture
+      #   by default created user will have default role for MANAGEMENT and PORTAL
+      #   you can override this by assigning user to groups, on user creation, if its user info content match expression
+#     groups:
+#       - mapping:
+#           condition: "{#jsonPath(#profile, '$.identity_provider_id') == 'idp_5' && #jsonPath(#profile, '$.job_id') != 'API_BREAKER'}"
+#           values: [Example group,soft user]
+#       - mapping:
+#           condition: "{#jsonPath(#profile, '$.job_id') != 'API_BREAKER'}"
+#           values: ["Api consumer"]
+
+# SMTP configuration used to send mails
+email:
+  enabled: false
+  host: smtp.my.domain
+  subject: "[Gravitee.io] %s"
+#  port: 465
+  from: noreply@my.domain
+  username: user@my.domain
+  password: password
+#  properties:
+#    auth: true
+#    starttls.enable: true
+#    ssl.trust: smtp.gmail.com
+
+# Mail templates
+#templates:
+#  path: ${gravitee.home}/templates
+
+# Referenced properties
+ds:
+  mongodb:
+    dbname: gravitee
+    host: ${GRAVITEEIO_MONGODB_HOST:localhost}
+    port: ${GRAVITEEIO_MONGODB_PORT:27017}
+  elastic:
+    host: ${GRAVITEEIO_ELASTIC_HOST:localhost}
+    port: ${GRAVITEEIO_ELASTIC_PORT:9200}
+
+jwt:
+  secret: myJWT4Gr4v1t33_S3cr3t
+  # Allows to define the end of validity of the token in seconds (default 604800 = a week)
+  #expire-after: 604800
+  # Allows to define the end of validity of the token in seconds for email registration (default 86400 = a day)
+  #email-registration-expire-after: 86400
+  # Allows to define issuer (default gravitee-management-auth)
+  #issuer: gravitee-management-auth
+  # Allows to define cookie context path (default /)
+  #cookie-path: /
+  # Allows to define cookie domain (default "")
+  #cookie-domain: .gravitee.io
+  # Allows to define if cookie secure only (default false)
+  #cookie-secure: true
+
+swagger:
+  # Default scheme used when creating an API from a Swagger descriptor if there is no scheme specified.
+  scheme: https
+
+user:
+  login:
+      # Create a default application when user connects to the portal for the very first time (default true)
+      #defaultApplication: true
+  creation:
+      # Allows to register new users from portal (default false)
+      #enabled: true
+    token:
+      #expire-after: 86400
+
+# The portal URL used in emails
+#portalURL: http://portal-url.net
+
+# Allows to create support ticket (default value: false)
+#support:
+  #enabled: true
+
+# Allows to rate an API (default value: false)
+#rating:
+  #enabled: true

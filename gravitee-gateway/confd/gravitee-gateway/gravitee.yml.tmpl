@@ -1,0 +1,381 @@
+############################################################################################################
+#################################### Gravitee.IO Gateway - Configuration ###################################
+############################################################################################################
+
+############################################################################################################
+# This file is the general configuration of Gravitee.IO Gateway:
+# - Properties (and respective default values) in comment are provided for information.
+# - You can reference other property by using ${property.name} syntax
+# - gravitee.home property is automatically set-up by launcher and refers to the installation path. Do not override it !
+#
+# Please have a look to http://docs.gravitee.io/ for more options and fine-grained granularity
+############################################################################################################
+
+#data center
+{{$dc := getenv "TARGET_DC"}}
+{{$tenant := getenv "TENANT"}}
+{{$sharding_tags := getenv "SHARDING_TAGS"}}
+
+#Gateway HTTP server
+#http:
+  # port: 8082
+  # host: 0.0.0.0
+  # idleTimeout: 0
+  # tcpKeepAlive: true
+  # compressionSupported: false
+  # instances: 0
+  # secured: false
+  # alpn: false
+
+{{if exists "/graviteeio/apim/gateway/http/customize"}}
+{{if eq (getv "/graviteeio/apim/gateway/http/customize") "true"}}
+http: 
+  port: {{getv "/graviteeio/apim/gateway/http/port" "8082"}}
+  host: {{getv "/graviteeio/apim/gateway/http/host" "0.0.0.0"}} 
+  idleTimeout: {{getv "/graviteeio/apim/gateway/http/idleTimeout" "0"}} 
+  tcpKeepAlive: {{getv "/graviteeio/apim/gateway/http/tcpKeepAlive" "true"}} 
+  compressionSupported: {{getv "/graviteeio/apim/gateway/http/compressionSupported" "false"}} 
+  instances: {{getv "/graviteeio/apim/gateway/http/instances" "0"}} 
+  secured: {{getv "/graviteeio/apim/gateway/http/secured" "false"}}
+  alpn: {{getv "/graviteeio/apim/gateway/http/alpn" "false"}} 
+
+#  ssl:
+#    clientAuth: false
+#    keystore:
+#      path: ${gravitee.home}/security/keystore.jks
+#      password: secret
+#    truststore:
+#      path: ${gravitee.home}/security/truststore.jks
+#      password: secret
+ 
+  {{if exists "/graviteeio/apim/gateway/http/ssl/customize"}} 
+  {{if eq (getv "/graviteeio/apim/gateway/http/ssl/customize") "true"}} 
+  ssl: 
+    clientAuth: {{getv "/graviteeio/apim/gateway/http/ssl/clientAuth" "false"}} 
+    keystore :
+      path : ${gravitee.home}{{getv "/graviteeio/apim/gateway/http/ssl/keystore/path" "/security/keystore.jks"}}
+      password : {{getv "/graviteeio/apim/gateway/http/ssl/keystore/secret" "secret"}} 
+    trustore :
+      path : ${gravitee.home}{{getv "/graviteeio/apim/gateway/http/ssl/truststore/path" "/security/truststore.jks"}} 
+      password : {{getv "/graviteeio/apim/gateway/http/ssl/truststore/secret" "secret"}} 
+  {{end}} #eq
+  {{end}} #ssl
+{{end}} #eq
+{{end}} #http
+
+
+# Plugins repository
+#plugins:
+#  path:
+#    - ${gravitee.home}/plugins
+#    - ${gravitee.home}/my-custom-plugins
+
+# If a plugin is already installed (but with a different version), management node does not start anymore
+#  failOnDuplicate: true
+
+{{if exists "/graviteeio/apim/gateway/plugins/customize"}}
+{{if eq (getv "/graviteeio/apim/gateway/plugins/customize") "true"}}
+plugins:
+  path:
+    - ${gravitee.home}{{getv "/graviteeio/apim/gateway/plugins/path/generic" "/plugins"}} 
+    - ${gravitee.home}{{getv "/graviteeio/apim/gateway/plugins/path/custom" "/my-custom-plugins"}} 
+  # If a plugin is already installed (but with a different version), management node does not start anymore
+  failOnDuplicate: {{getv "/graviteeio/apim/gateway/plugins/failOnDuplicate" "true"}} 
+{{end}} #eq
+{{end}} #plugins
+
+# Management repository is used to store global configuration such as APIs, applications, apikeys, ...
+# This is the default configuration using MongoDB (single server)
+# For more information about MongoDB configuration, please have a look to:
+# - http://api.mongodb.org/java/current/com/mongodb/MongoClientOptions.html
+management:
+  {{if exists "/graviteeio/apim/gateway/management/datasource/type"}}
+  type: {{getv "/graviteeio/apim/gateway/management/datasource/type"}}
+  {{if eq (getv "/graviteeio/apim/gateway/management/datasource/type") "mongodb"}}
+  mongodb:
+    {{if exists "/graviteeio/apim/gateway/management/datasource/config/type"}}
+    {{if eq (getv "/graviteeio/apim/gateway/management/datasource/config/type") "default"}}
+
+ #    dbname: ${ds.mongodb.dbname}
+ #    host: ${ds.mongodb.host}
+ #    port: ${ds.mongodb.port}
+ #    username:
+ #    password:
+ #    connectionsPerHost: 0
+ #    connectTimeout: 500
+ #    maxWaitTime: 120000
+ #    socketTimeout: 500
+ #    socketKeepAlive: false
+ #    maxConnectionLifeTime: 0
+ #    maxConnectionIdleTime: 0
+ #    serverSelectionTimeout: 0
+ #    description: gravitee.io
+ #    heartbeatFrequency: 10000
+ #    minHeartbeatFrequency: 500
+ #    heartbeatConnectTimeout: 1000
+ #    heartbeatSocketTimeout: 20000
+ #    localThreshold: 15
+ #    minConnectionsPerHost: 0
+ #    sslEnabled: false
+ #    threadsAllowedToBlockForConnectionMultiplier: 5
+ #    cursorFinalizerEnabled: true
+ 
+    authSource: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/authSource" "admin"}}
+    dbname: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/dbname" "${ds.mongodb.dbname}"}}
+    host: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/host" "${ds.mongodb.host}" }}
+    port: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/port" "${ds.mongodb.port}" }}
+    username: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/username" "gravitee"}}
+    password: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/password" ""}}
+ #   connectionsPerHost: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/connectionsPerHost" "0"}}
+ #   connectTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/connectTimeout" "500"}}
+ #   maxWaitTime: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/maxWaitTime" "120000"}}
+ #   socketTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/socketTimeout" "500"}}
+ #   socketKeepAlive: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/socketKeepAlive" "false"}} 
+ #   maxConnectionLifeTime: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/maxConnectionLifeTime" "0"}} 
+ #   maxConnectionIdleTime: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/maxConnectionIdleTime" "0"}}
+ #   serverSelectionTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/serverSelectionTimeout" "0"}} 
+ #   description: {{getv "/graviteeio/apim/gateway/management/mongo/datasource/default/description" "gravitee.io"}}
+ #   heartbeatFrequency: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/heartbeatFrequency" "10000"}}
+ #   minHeartbeatFrequency: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/minHeartbeatFrequency" "500"}}
+ #   heartbeatConnectTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/heartbeatConnectTimeout" "1000"}}
+ #   heartbeatSocketTimeout: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/heartbeatSocketTimeout" "20000"}}
+ #   localThreshold: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/localThreshold" "15"}}
+ #   minConnectionsPerHost: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/minConnectionsPerHost" "0"}}
+ #   sslEnabled: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/sslEnabled" "false"}}
+ #   threadsAllowedToBlockForConnectionMultiplier: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/threadsAllowedToBlockForConnectionMultiplier" "5"}}
+ #   cursorFinalizerEnabled: {{getv "/graviteeio/apim/gateway/management/datasource/config/default/cursorFinalizerEnabled" "true"}}
+
+    {{else if eq (getv "/graviteeio/apim/gateway/management/datasource/config/type") "uri"}}
+    # Management repository: single MongoDB using URI
+    # - http://api.mongodb.org/java/current/com/mongodb/MongoClientURI.html
+    # uri: mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]
+    {{ $mongo_uri := printf "/graviteeio/apim/gateway/management/mongo/config/uri/dc_%s/uri" $dc }}
+    uri : {{getv $mongo_uri "ERR_NOT_DEFINED"}}
+
+    {{else if eq (getv "/graviteeio/apim/gateway/management/datasource/config/type") "cluster"}}
+    # Management repository: clustered MongoDB
+ #    servers:
+ #      - host: mongo1
+ #        port: 27017
+ #      - host: mongo2
+ #        port: 27017
+ #    dbname: ${ds.mongodb.dbname}
+ #    connectTimeout: 500
+ #    socketTimeout: 250
+      servers: 
+      {{ $list := printf "/graviteeio/apim/gateway/management/mongo/config/cluster/dc_%s/servers/*" $dc }}
+      {{ range getvs $list }} 
+      {{ $hostPort := split . ":"}}  
+        - hosts:  {{ index $hostPort 0 }}
+          port: {{ index $hostPort 1 }}
+      {{end}}   
+    {{else}}
+    dbname: ${ds.mongodb.dbname}
+    host: ${ds.mongodb.host}
+    port: ${ds.mongodb.port}
+    {{end}} 
+    {{end}} #exists config
+
+    {{else if eq (getv "/graviteeio/apim/gateway/management/datasource/type") "dynamodb"}}
+  dynamodb:
+   ##### TODO #####
+  {{end}}
+  {{else}} 
+  type: mongodb
+  mongodb:
+    dbname: ${ds.mongodb.dbname}
+    host: ${ds.mongodb.host}
+    port: ${ds.mongodb.port}
+  {{end}} # exists datasource
+
+
+# When defining rate-limiting policy, the gateway has to store data to share with other gateway instances.
+# In this example, we are using MongoDB to store counters.
+ratelimit:
+   {{ $mongo_uri := printf "/graviteeio/apim/gateway/management/mongo/config/uri/dc_%s/uri" $dc }}
+  {{if exists "/graviteeio/apim/gateway/management/datasource/type"}}
+  {{if eq (getv "/graviteeio/apim/gateway/management/datasource/type") "mongodb"}}
+  type: mongodb 
+  mongodb:
+    uri: {{getv $mongo_uri "mongodb://${ds.mongodb.host}/${ds.mongodb.dbname}"}} 
+  {{end}}
+  {{else}} 
+  type: mongodb 
+  mongodb:
+    uri: {{getv $mongo_uri "mongodb://${ds.mongodb.host}/${ds.mongodb.dbname}"}} 
+  {{end}} 
+
+cache:
+  type: {{getv "/graviteeio/apim/gateway/cache/type" "ehcache"}}
+
+# Reporters configuration (used to store reporting monitoring data, request metrics, healthchecks and others...
+# All reporters are enabled by default. To stop one of them, you have to add the property 'enabled: false'
+reporters:
+  enabled: false
+  # Reporting system configuration
+  system:
+    buffersize:  {{getv "/graviteeio/apim/gateway/reporters/system/buffersize" "4096"}} # Must be a power of 2
+
+  {{if exists "/graviteeio/apim/gateway/reporters/config/customize"}}
+  {{if eq (getv "/graviteeio/apim/gateway/reporters/config/customize") "true"}}
+  {{range $reporter :=  getvs "/graviteeio/apim/gateway/reporters/list/*"}} 
+  {{print $reporter }}:
+  {{if eq  $reporter "elasticsearch"}}
+    enabled: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/enabled" "true"}} # Is the reporter enabled or not (default to true)
+    endpoints:
+    {{if exists "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/type"}}
+    {{if eq (getv "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/type") "cluster"}}
+    {{ $es_list := printf "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/servers/dc_%s/*" $dc }}
+    {{range getvs $es_list}}  
+      - {{.}}
+    {{end}}
+    {{else if eq (getv "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/type") "default"}}
+    {{ $es_host := printf "/graviteeio/apim/gateway/reporters/elasticsearch/endpoints/servers/dc_%s/1" $dc }}
+      - http://{{getv $es_host}}
+    {{else}}
+      - http://${ds.elastic.host}:${ds.elastic.port}
+    {{end}}
+    {{else}}
+      - http://${ds.elastic.host}:${ds.elastic.port}
+    {{end}}
+    
+    security:
+      username: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/security/username" "gravitee"}} 
+      password: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/security/password" "gravitee"}}   
+  
+    index: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/index" "gravitee"}}
+    cluster: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/cluster" "elasticsearch"}}
+    bulk:
+      actions: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/bulk/actions" "1000"}}           # Number of requests action before flush
+      flush_interval: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/bulk/flush_interval" "5"}}       # Flush interval in seconds
+      concurrent_requests: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/bulk/conccurent_requests" "5"}}  # Concurrent requests
+    settings:
+      number_of_shards: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/settings/number_of_shards" "5"}} 
+      number_of_replicas: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/settings/number_of_replicas" "1"}}
+    pipeline:
+      plugins:
+        ingest: {{getv "/graviteeio/apim/gateway/reporters/elasticsearch/pipeline/plugins/ingest" "geoip"}} 
+ 
+  {{else if eq  $reporter "cloudwatch" }}
+    enabled : {{getv "/graviteeio/apim/gateway/reporters/cloudwatch/enabled" "true"}}  
+     ### TODO ###
+  {{end}} # eq ES || cloudwatch 
+  {{end}} #range reporter 
+  {{else}}
+  elasticsearch :
+    enabled: true # Is the reporter enabled or not (default to true)
+    endpoints:
+      - http://${ds.elastic.host}:${ds.elastic.port}
+  {{end}}
+  {{else}}
+  elasticsearch :
+    enabled: true # Is the reporter enabled or not (default to true)
+    endpoints:
+      - http://${ds.elastic.host}:${ds.elastic.port}
+  {{end}}
+
+# Gateway service configurations. Provided values are default values.
+# All services are enabled by default. To stop one of them, you have to add the property 'enabled: false' (See the
+# 'local' service for an example).
+services:
+  core:
+    http:
+      enabled: {{getv "/graviteeio/apim/gateway/services/core/http/enabled" "true"}}
+      port: {{getv "/graviteeio/apim/gateway/services/core/http/port" "18082"}}
+      host: {{getv "/graviteeio/apim/gateway/services/core/http/host" "localhost"}}
+      authentication:
+        # authentication type to be used for the core services
+        # - none : to disable authentication
+        # - basic : to use basic authentication
+        # default is "basic"
+        type: {{getv "/graviteeio/apim/gateway/services/core/http/authentication/type" "basic"}}
+        users:
+          admin: {{getv "/graviteeio/apim/gateway/services/core/http/authentication/users/admin" "adminadmin"}}
+
+  # Synchronization daemon used to keep the gateway state in sync with the configuration from the management repository
+  # Be aware that, by disabling it, the gateway will not be sync with the configuration done through management API
+  # and management UI
+  sync:
+    # Synchronization is done each 5 seconds
+    cron: {{getv "/graviteeio/apim/gateway/services/sync/cron" "'*/5 * * * * *'"}}
+
+  # Service used to store and cache api-keys from the management repository to avoid direct repository communication
+  # while serving requests.
+  apikeyscache:
+    delay:  {{getv "/graviteeio/apim/gateway/services/apikeyscache/delay" "10000"}}
+    unit:  {{getv "/graviteeio/apim/gateway/services/apikeyscache/unit" "MILLISECONDS"}}
+    threads: {{getv "/graviteeio/apim/gateway/services/apikeyscache/threads" "3"}} # Threads core size used to retrieve api-keys from repository.
+
+  # Local registry service.
+  # This registry is used to load API Definition with json format from the file system. By doing so, you do not need
+  # to configure your API using the web console or the rest API (but you need to know and understand the json descriptor
+  # format to make it work....)
+  local:
+    enabled: {{getv "/graviteeio/apim/gateway/services/local/enabled" "false"}}
+    path: {{getv "/graviteeio/apim/gateway/services/local/path" "${gravitee.home}/apis"}} # The path to API descriptors
+
+  # Gateway monitoring service.
+  # This service retrieves metrics like os / process / jvm metrics and send them to an underlying reporting service.
+  monitoring:
+    delay: {{getv "/graviteeio/apim/gateway/services/monitoring/delay" "5000"}}
+    unit: {{getv "/graviteeio/apim/gateway/services/monitoring/unit" "MILLISECONDS"}}
+
+  # Endpoint healthcheck service.
+  healthcheck:
+    threads: 3 # Threads core size used to check endpoint availability
+
+  {{if exists "/graviteeio/apim/gateway/services/cloudwatch/enabled"}}
+  {{if eq (getv "/graviteeio/apim/gateway/services/cloudwatch/enabled") "true"}}
+  cloudwatch:
+    enabled: true
+    dashboardName: {{getv "/graviteeio/apim/gateway/services/cloudwatch/dashboardName" "dashboardName"}}
+  {{end}}
+  {{end}}
+  
+handlers:
+  request:
+    transaction:
+      header: {{getv "/graviteeio/apim/gateway/handlers/request/transaction/header" "X-Gravitee-Transaction-Id"}}
+
+# Referenced properties
+ds:
+  mongodb:
+    dbname: gravitee
+    host: ${GRAVITEEIO_MONGODB_HOST:localhost}
+    port: ${GRAVITEEIO_MONGODB_PORT:27017}
+  elastic:
+    host: ${GRAVITEEIO_ELASTIC_HOST:localhost}
+    port: ${GRAVITEEIO_ELASTIC_PORT:9200}
+
+# Sharding tags configuration
+# Allows to define inclusion/exclusion sharding tags to only deploy a part of APIs. To exclude just prefix the tag with '!'.
+#tags: products,stocks,!international
+{{if ne $sharding_tags ""}}
+tags: {{printf "%s" $sharding_tags}}
+{{end}}
+
+# Multi-tenant configuration
+# Allow only a single-value
+#tenant: europe
+{{if ne $tenant ""}}
+tenant: {{printf "%s" $tenant}}
+{{end}}
+
+
+#policy:
+# Customize the api-key header and / or query parameter
+#  api-key:
+#    header: X-Gravitee-Api-Key
+#    param: api-key
+
+{{if exists "/graviteeio/apim/gateway/policy/customize"}}
+{{if eq (getv "/graviteeio/apim/gateway/policy/customize") "true"}}
+policy:
+# Customize the api-key header and / or query parameter
+  api-key:
+    header: {{getv "/graviteeio/apim/gateway/policy/api-key/header" "X-Gravitee-Api-Key"}}
+    param: {{getv "/graviteeio/apim/gateway/policy/api-key/param" "api-key"}} 
+{{end}}
+{{end}}
+
+

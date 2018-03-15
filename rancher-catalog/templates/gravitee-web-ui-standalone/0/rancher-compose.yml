@@ -1,0 +1,24 @@
+version: '2'
+.catalog:
+  name: Gravitee.io web UI 
+  version: Version 1.13.2
+  description: "Gravitee.io web UI"
+  questions:
+    - variable: environment_prefix
+      label: "Environment prefix"
+      description: |
+        This is the prefix used for consul as 'qualification/white'
+      default: "qualification/hmbu"
+      required: true
+      type: string
+    - variable: consul_uri
+      label: "Consul URI"
+      description: |
+        The consul URI for key/value management of environment variable
+      default: "consul.consul.rancher.internal:8500"
+      required: true
+      type: string
+services:
+  webapp:
+    scale: 1
+    start_on_create: true

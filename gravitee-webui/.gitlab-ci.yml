@@ -1,0 +1,12 @@
+# .gitlab-ci.yml
+gravitee-web-ui:
+ script:
+ - docker login -u jenkins-builder -p eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJzbHkiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiYnVpbGRlci10b2tlbi1yZmk4aiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJidWlsZGVyIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiMDQzN2U2MTUtYjgwMi0xMWU3LWJkZTItMDA1MDU2ODExOGE0Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OnNseTpidWlsZGVyIn0.H-CMuoD95x_6aDxpVSspkat6Qb2hdRBtGvYxDPbBGdTTfYySwJhd0K3NGyjV-l-6SEmLctNx7uKZvovtIiAR7c9sEiSTXOnXSnFtSgObFzLXSWZr1kL_2kk9CtVPUrl3VWzSTXitmMVqB_mDUNVsfL-iYz8uOWHX6Mj9rYNWcAzbbIQKm6lZxUEk-q63K8GfUssWckIpBuJMkI1CV7sjr1yM6UAsZbUKEzmxZmCJE4GnnrfccJFOTp--fk57D9NZ41w2G-9pZYPrRc7CoivvYqF8cO6rR7MNeqMmnz4ehfMG66tCLdOoUsHVZ657Vx0EECddF4XEaUaH-HfcuAEllg registry.adeo.com
+ - docker build -t gravitee-web-ui . 
+ - docker tag gravitee-web-ui registry.adeo.com/sly/gravitee-web-ui:1.0.0-SNAPSHOT
+ - docker push registry.adeo.com/sly/gravitee-web-ui:1.0.0-SNAPSHOT
+ tags:
+ - build
+ - docker
+ - images
+

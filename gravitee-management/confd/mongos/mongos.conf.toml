@@ -1,0 +1,18 @@
+[template]
+src = "mongos.conf.tmpl"
+dest = "/home2/mongodb/mongos.conf"
+mode = "0600"
+owner = "mongod"
+group = "mongod"
+keys = [
+		"/graviteeio/apim/mongos/dc_a/configdb",
+		"/graviteeio/apim/mongos/dc_a/port",
+		"/graviteeio/apim/mongos/dc_b/configdb",
+		"/graviteeio/apim/mongos/dc_b/port",
+		"/graviteeio/apim/mongos/dc_c/configdb",
+		"/graviteeio/apim/mongos/dc_c/port",
+		"/graviteeio/apim/mongos/dc_d/configdb",
+		"/graviteeio/apim/mongos/dc_d/port",
+		"/graviteeio/apim/mongos/dc_e/configdb",
+		"/graviteeio/apim/mongos/dc_e/port"
+]

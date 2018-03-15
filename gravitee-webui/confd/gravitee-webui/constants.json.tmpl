@@ -1,0 +1,76 @@
+{
+  {{if exists "/graviteeio/apim/webui/baseUrl"}}
+  "baseURL": "{{getv "/graviteeio/apim/webui/baseUrl"}}",
+  {{else}}
+  "baseURL": "http://localhost:8083/management/" ,
+  {{end}}
+  "portalTitle": "ADEO Mutualized Gravitee.io portal",
+  "managementTitle": "ADEO Mutualized Gravitee.io portal",
+  {{if exists "/graviteeio/apim/webui/devMode"}}
+  "devMode": {{getv "/graviteeio/apim/webui/devMode"}},
+  {{else}}
+  "devMode": false,
+  {{end}}
+  {{if exists "/graviteeio/apim/webui/userCreation"}}
+  "userCreationEnabled": {{getv "/graviteeio/apim/webui/userCreation"}},
+  {{else}}
+  "userCreationEnabled": true,
+  {{end}}
+  "documentation": {
+    "url": "https://docs.gravitee.io"
+  },
+  "portal": {
+    {{if exists "/graviteeio/apim/webui/portal/entryPoint"}}
+    "entrypoint": "{{getv "/graviteeio/apim/webui/portal/entryPoint"}}",
+    {{else}}
+    "entrypoint": "https://api.company.com", 
+    {{end}}
+    {{if exists "/graviteeio/apim/webui/portal/apiKeyHeader"}}
+    "apikeyHeader": "{{getv "/graviteeio/apim/webui/portal/apiKeyHeader"}}" ,
+    {{else}}
+    "apikeyHeaders": "X-Gravitee-Api-Key",
+    {{end}}
+    "apis": {
+      {{if exists "/graviteeio/apim/webui/portal/apis/tileMode"}}
+      "tilesMode": {{getv "/graviteeio/apim/webui/portal/apis/tileMode"}}
+      {{else}}
+      "tilesMode": true
+      {{end}}
+    }
+  },
+  "theme": {
+    "name": "default",
+    "logo": "themes/assets/GRAVITEE_LOGO1-01.png",
+    "loader": "assets/gravitee_logo_anim.gif"
+  },
+  "support": {
+    {{if exists "/graviteeio/apim/webui/support"}}
+    "enabled": {{getv "/graviteeio/apim/webui/support"}}
+    {{else}}
+    "enabled": false
+    {{end}}
+  },
+  "rating": {
+    {{if exists "/graviteeio/apim/webui/rating"}}
+    "enabled": {{getv "/graviteeio/apim/webui/rating"}}
+    {{else}}
+    "enabled": false
+    {{end}}
+  },
+  "analytics": {
+    {{if exists "/graviteeio/apim/webui/analytics"}}
+    "enabled": {{getv "/graviteeio/apim/webui/analytics"}},
+    {{else}}
+    "enabled": false,
+    {{end}}
+    "trackingId": ""
+  },
+  "scheduler": {
+    {{if exists "/graviteeio/apim/webui/scheduler/tasks"}}
+    "tasks": {{getv "/graviteeio/apim/webui/scheduler/tasks"}}
+    {{else}}
+    "tasks": "10"
+    {{end}}
+  }
+}
+

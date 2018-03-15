@@ -1,0 +1,41 @@
+version: '2'
+.catalog:
+  name: Mongos router
+  version: Version 1.0.0
+  description: "Mongos router"
+  questions:
+    - variable: environment_prefix
+      label: "Environment prefix"
+      description: |
+        This is the prefix used for consul as 'qualification/white'
+      default: "qualification/hmbu"
+      required: true
+      type: string
+    - variable: consul_uri
+      label: "Consul URI"
+      description: |
+        The consul URI for key/value management of environment variable
+      default: "consul.consul.rancher.internal:8500"
+      required: true
+      type: string
+    - variable: dc
+      label: "Target Datacenter"
+      description: |
+        a = Z2, b = Y1, c = X1, d = F1, e = G1
+      required: false
+      default: a
+      type: string
+services:
+  mongos-router:
+    scale: 1
+    start_on_create: true
+
+  gravitee-web-ui:
+    scale: 1
+    start_on_create: true
+
+  gravitee-management-api:
+    scale: 1
+    start_on_create: true
+    depends_on:
+      - "mongos-router"

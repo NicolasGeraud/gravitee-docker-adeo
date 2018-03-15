@@ -1,0 +1,8 @@
+name: Gravitee gateway
+description: |
+  Gravitee gateway SOLO
+version: 1.0.0
+category: API mangement
+maintainer: Olivier Lehouck <olivier.lehouck@adeo.com>
+projectURL: 
+
